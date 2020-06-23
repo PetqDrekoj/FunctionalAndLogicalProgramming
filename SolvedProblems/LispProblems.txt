@@ -1,0 +1,200 @@
+-- l1 --
+
+1) a)
+
+(defun nElemOfAList (l n)
+    (cond 
+        ( (null l) nil)
+        ( (equal n 1) (car l) )
+        ( t (nElemOfAList (cdr l) (- n 1)) )
+    )
+)
+
+1) b)
+
+(defun memberOfList (l n)
+    (cond 
+        ( (null l) nil)
+        ( (and (atom (car l)) (equal n (car l)) ) t )
+        ( (listp (car l)) (memberOfList (car l) n) )
+        ( t (memberOfList (cdr l) n ) )
+    )
+)
+
+1) c)
+
+(defun nrOfSubLists (l)
+    (cond 
+        ( (null l) 0)
+        ( (atom (car l)) (nrOfSubLists (cdr l)) )
+        ( t (+ 1 (nrOfSubLists (car l)) (nrOfSubLists (cdr l) ) ) )
+    )
+)
+(print (+ 1 (nrOfSubLists '(1 2 (3 (4 5) (6 7)) 8 (9 10)) ) ))
+
+1) d)
+
+(defun ListToSet (l)
+    (cond
+        ( (null l) nil)
+        ( (memberOfList (cdr l) (car l)) (ListToSet (cdr l)) )
+        ( t (append (ListToSet (cdr l)) (cons(car l) nil) ) )
+    )
+)
+
+2) b)
+
+(defun depthOfAList (l)
+    (cond 
+        ( (null l) 1)
+        ( (atom (car l)) (depthOfAList (cdr l) ) )
+        ( t (max (+ 1(depthOfAList (car l))) (depthOfAList (cdr l)) ) )
+    )
+)
+
+4) b)
+
+(defun getAtoms (l)
+    (cond 
+        ( (null l) nil)
+        ( (atom (car l)) (append (cons (car l) nil) (getAtoms (cdr l))) )
+        ( t (append(getAtoms (car l)) (getAtoms (cdr l))))
+    )
+)
+
+4)c)
+
+(defun invertAtoms ( l s )
+    (cond
+        ( (null l ) s)
+        ( (atom (car l)) (invertAtoms (cdr l) (append (cons (car l) nil) s)) )
+        ( t (append s (list(invertAtoms (car l) nil)) (invertAtoms (cdr l) nil)))
+    )
+)
+
+(print (invertAtoms '(a b c (d (e f) g h i)) nil))
+
+5)b)
+
+(defun assocList ( l1 l2 )
+    (cond
+        ( (or(null l1)(null l2)) nil)
+        ( t (cons(cons (car l1)(car l2)) (assocList (cdr l1) (cdr l2))))
+    )
+)
+
+9)c)
+
+(defun invertList (l)
+    (cond
+        ( (null l) nil)
+        (t (append (invertList (cdr l)) (cons (car l) nil) ) )
+    )
+)
+
+(defun sum ( l1 l2 s r )
+    (cond 
+        ( (and(null l1)(null l2)(= r 0)) s)
+        ( (and(null l1)(null l2)) (sum nil nil (append (cons r nil) s) 0) )
+        ( (null l1) (sum nil (cdr l2) (append (cons (mod(+(car l2) r) 10) nil) s) (floor (+(car l2) r) 10)))
+        ( (null l2) (sum (cdr l1) nil (append (cons (mod(+(car l1) r) 10) nil) s) (floor (+(car l1) r) 10)))
+        ( t (sum (cdr l1) (cdr l2) (append (cons (mod(+(car l1) (car l2) r) 10) nil) s) (floor (+(car l1)(car l2) r) 10)))
+    )
+)
+
+(defun main (l1 l2) (sum (invertList l1) (invertList l2) nil 0))
+
+(print (main '(1 1) '(9 8 9) ))
+
+10)c)
+
+(defun  ArithExp( l1 s )
+    (cond 
+        ( (and(null l1) (null (cdr s)) (car s)) )
+        ( (null l1) (ArithExp s nil) )
+        ( (AND(equal (car l1) '+) (numberp(cadr l1)) (numberp (caddr l1))) (ArithExp (cdddr l1) (append s (cons (+ (cadr l1) (caddr l1)) nil))))
+        ( (AND(equal (car l1) '-) (numberp(cadr l1)) (numberp (caddr l1))) (ArithExp (cdddr l1) (append s (cons (- (cadr l1) (caddr l1)) nil))))
+        ( (AND(equal (car l1) '*) (numberp(cadr l1)) (numberp (caddr l1))) (ArithExp (cdddr l1) (append s (cons (* (cadr l1) (caddr l1)) nil))))
+        ( (AND(equal (car l1) '/) (numberp(cadr l1)) (numberp (caddr l1))) (ArithExp (cdddr l1) (append s (cons (floor (cadr l1) (caddr l1)) nil))))
+        ( t (ArithExp (cdr l1) (append s (cons (car l1) nil))) )
+    )
+)
+
+11)b)
+
+(defun  mountain( l u n )
+    (cond 
+        ( (and(null (cdr l)) (equal u 1) (equal n 1)) t)
+        ( (null (cdr l)) nil)
+        ( (and (<(car l)(cadr l)) (equal n 0)) (mountain (cdr l) 1 0))
+        ( (and (>(car l)(cadr l)) (equal u 1)) (mountain (cdr l) 1 1))
+        ( t nil)
+    )
+)
+
+
+
+
+
+
+-- l2 --
+
+; 11.Return the level (and coresponded list of nodes) with maximum number of nodes for a tree of type (2). The level of the root element is 0.
+
+(defun f (l s nrOfNodes maxNrOfNodes currentLevel maxLevel currentListOfNodes maxListOfNodes)
+    (cond 
+        ( (and(null l) (null s) (>= nrOfNodes maxNrOfNodes)) (list currentLevel currentListOfNodes) )
+        ( (and(null l) (null s)) (list maxLevel maxListOfNodes) )
+        ( (and(null l)(>= nrOfNodes maxNrOfNodes)) (f s nil 0 nrOfNodes (+ currentLevel 1) currentLevel nil currentListOfNodes) )
+        ( (null l) (f s nil 0 maxNrOfNodes (+ currentLevel 1) maxLevel nil maxListOfNodes) )
+        ( (atom (car l)) (f (cdr l) s (+ nrOfNodes 1) maxNrOfNodes currentLevel maxLevel (append currentListOfNodes (cons (car l) nil)) maxListOfNodes ) )
+        ( t (f (cdr l) (append s (car l)) nrOfNodes maxNrOfNodes currentLevel maxLevel currentListOfNodes maxListOfNodes ) )
+    )
+)
+
+(defun wrapper (l) (f l nil 0 0 0 0 nil nil))
+
+(print (wrapper '(A (B) (C (D) (E) (F)))))
+
+
+;(A 2 B 0 C 2 D 0 E 0)
+;(A (B) (C (D) (E)))
+;Convert a tree of type (2) to type (1).
+
+;convert(l1...ln) = { [], n=0
+;                   { l1 U 2 U convert(l2) U convert(l3), lenght(L)=3
+;                   { l1 U 1 U convert(l2), length(L)=2
+;                   { l1 U 0, otherwise
+
+(defun convert(l)
+    (cond
+        ((null l) nil)
+        ( (= 3 (length l) ) (append (list (car l)) (list 2) (convert (cadr l) ) (convert (caddr l))))
+        ( (= 2 (length l) ) (append (list (car l)) (list 1) (convert (cdr l) ) ))
+        ( t (append (list (car l)) (list 0)))
+    )
+)
+
+(print (convert '(A (B) (C (D) (E)))))
+
+
+
+
+
+;Return the list of nodes of a tree of type (2) accessed inorder
+
+;inorder(l1...ln)={ [], n=0
+;                 { inorder(l2) U l1 U inorder(l3), length(L)=3
+;                 { inorder(l2) U l1, length(L)=2
+;                 { l1, otherwise
+
+(defun inorder(l)
+    (cond
+        ((null l) nil)
+        (t (append (inorder(cadr l)) (list(car l)) (inorder (caddr l)) ) )
+    )
+)
+(print (inorder '(A (B) (C (D) (E)))))
+
+
+

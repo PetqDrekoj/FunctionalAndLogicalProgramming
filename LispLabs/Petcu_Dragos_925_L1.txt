@@ -1,0 +1,151 @@
+;10.
+; a)Write a function to return the product of all the numerical atoms from a list, at superficial level.
+; b)Write a function to replace the first occurence of an element E in a given list with an other element O.
+; c)Write a function to compute the result of an arithmetic expression memorised in preorder on a stack. 
+; Examples:(+ 1 3) ==> 4  (1 + 3)(+ * 2 4 3) ==> 11  [((2 * 4) + 3)(+ * 2 4 -5 * 2 2) ==> 9  ((2 * 4) + (5 -(2 * 2))
+; d)Write  a  function  to  produce  the  list  of  pairs  (atom  n),  where  atom  appears  for  n  times  in  the parameter list. 
+; Example:(A B A B A C A) --> ((A 4) (B 2) (C 1)).
+
+;a)
+
+
+; product(l1..ln) = { 1, n = 0
+;		 l1*product(l2..ln), l1 is number  
+;		product(l2..ln), otherwise
+; ( list ) 
+; ( i )
+
+(defun product (l)
+    ( cond
+        ((null l)  1 )
+        ((AND (numberp (car l) )) (*(car l) (product (cdr l))))
+        (t (product (cdr l) ))
+    )
+)
+
+( print (product '(1 2 3 4 (2 3 4) a b c 3) ) )
+
+
+
+;b)
+
+
+
+; repStOcc(l1..ln,E,O) = { 
+;		[], n = 0
+;		O U (l2..ln), l1 is atom AND l1 == E 
+;		repStOcc(l1) U (l2..ln), l1 is list AND l1 != repStOcc(l1)
+;		l1 U repStOcc(l2..ln), otherwise
+; ( list , int, int) 
+
+
+(defun repStOcc(l E O)
+    ( cond
+        ( (null l) nil )
+        ( (AND(atom (car l)) (equal E (car l))) (append (cons O nil) (cdr l) ) )
+        ( (atom (car l)) (append (cons (car l) nil) (repStOcc (cdr l) E O) ) )
+        ( (equal (repStOcc(car l) E O) (car l) ) (cons (car l) (repStOcc(cdr l) E O)) )
+        ( t (cons (repStOcc (car l) E O ) (cdr l) ) )
+
+    )
+
+)
+
+( print (repStOcc '(1 (2 3 4) 5 1 2 3 4  a) 2 9))
+
+
+
+
+
+;d)
+
+
+
+
+; countAllOcc(l1..ln,E) = { 
+;		0, n = 0
+;		1 + countAllOcc(l2..ln,E) , l1 is atom AND l1 == E 
+;		countAllOcc(l1,E) + countAllOcc(l2..ln,E), l1 is list 
+;		countAllOcc(l2..ln,E), otherwise
+
+
+(defun countAllOcc ( l E )
+    (cond 
+            ( (null l) 0)
+            ( (AND(atom (car l)) (equal(car l) E)) (+ 1 (countAllOcc (cdr l) E) ) )
+            ( (atom (car l) ) (countAllOcc (cdr l) E) )
+            ( (equal(car l) (countAllOcc (car l) E)) (countAllOcc (cdr l) E) )
+            ( t (+ (countAllOcc(car l) E) (countAllOcc (cdr l) E) ) )
+    )
+)
+
+; delAllOcc(l1..ln,E) = { 
+;		[], n = 0
+;		l1 U delAllOcc(l2..ln,E), l1 is atom AND l1 != E 
+;		delAllOcc(l2..ln,E), l1 is atom and l1 == E
+;		delAllOcc(l1,E) U delAllOcc(l2..ln,E), l1 is list
+
+
+(defun delAllOcc ( l E )
+    (cond 
+            ( (null l) nil)
+            ( (AND(atom (car l)) (equal(car l) E)) (delAllOcc (cdr l) E) )
+            ( (atom (car l) ) (append (cons (car l) nil) (delAllOcc (cdr l) E) ) )
+            ( t (cons (delAllOcc (car l) E) (delAllOcc (cdr l) E) ) )
+    )
+)
+
+
+; main ( l1 .. ln) = 
+;			[], n = 0
+;			(l1,countAllOcc(l1..ln,l1)) U main(delAllOcc(l2..ln,l1)), l1 atom
+;			main(l2..ln), otherwise 
+
+(defun main ( l )
+    (cond
+            ( (null l) nil )
+            ( (atom(car l)) (cons (list (car l) (countAllOcc l (car l))) (main (delAllOcc(cdr l) (car l)) ) ))
+            ( t (main (cdr l)) ) 
+    )
+)
+
+
+( print (main '(1 2 3 1 4 5 1 5)))
+
+
+
+;c)
+
+
+; arth(l1..ln) = {
+;		(l2+l3) U arth(l4..ln) , l1 is '+' AND l2 is number AND l3 is number
+;		(l2-l3) U arth(l4..ln) , l1 is '-' AND l2 is number AND l3 is number
+;		(l2*l3) U arth(l4..ln) , l1 is '*' AND l2 is number AND l3 is number
+;		(l2/l3) U arth(l4..ln) , l1 is '/' AND l2 is number AND l3 is number
+;		l1 U arth(l2..ln), otherwise
+
+; main(l1..ln) = {
+;		[l1], n = 1
+;		arth(l1..ln), otherwise
+
+
+
+(defun arth ( l )
+    (cond 
+            ( (null l) nil)
+            ( (AND (eq (car l) '+ ) (numberp (car(cdr l))) (numberp(car(cdr (cdr l)))) ) (append(cons (+ (car (cdr l)) (car(cdr (cdr l)))) nil) (cdr(cdr(cdr l)))) ) 
+            ( (AND (eq (car l) '- ) (numberp(car (cdr l))) (numberp(car(cdr (cdr l)))) ) (append(cons (- (car (cdr l)) (car(cdr (cdr l)))) nil) (cdr(cdr(cdr l)))) ) 
+            ( (AND (eq (car l) '* ) (numberp(car (cdr l))) (numberp(car(cdr (cdr l)))) ) (append(cons (* (car (cdr l)) (car(cdr (cdr l)))) nil) (cdr(cdr(cdr l)))) ) 
+            ( (AND (eq (car l) '/ ) (numberp(car (cdr l))) (numberp(car(cdr (cdr l)))) ) (append(cons (/ (car (cdr l)) (car(cdr (cdr l)))) nil) (cdr(cdr(cdr l)))) ) 
+            ( t (append (cons (car l) nil) (arth(cdr l) ) ) )
+    )
+)
+
+(defun main(l)
+    (cond
+            ( (null(cdr l)) (car l) )
+            ( t (main (arth l)) )
+    )
+)
+
+(print (main '(+ * 2 4 - 5 * 2 2) ) )

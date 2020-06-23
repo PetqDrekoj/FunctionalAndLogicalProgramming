@@ -1,0 +1,31 @@
+(defun coni (l &rest r)
+    (cond 
+        ( (and(null r) (equal (MOD l 2) 1)) (list l))
+        ( (null r) nil)
+        ( (equal (MOD l 2) 1) (cons l (apply 'coni r)))
+        ( t (apply 'coni r))
+    )
+)
+
+(print (apply 'coni '(1 2 3 4 5)))
+
+
+
+(defun verif(l)
+    (cond
+        ( (and(null (cdr l))(atom (car l))(not(numberp (car l)))) 1)
+        ( (and(null (cdr l))(atom (car l))) 0)
+        ( (null (cdr l)) (verif (car l)))
+        ( t (verif (cdr l)))
+    )
+)
+
+(defun f(l)
+    (cond 
+        ( (atom l) nil)
+        ( t (cons(verif l) (mapcan 'f l)))
+    )
+)
+
+;( print (verif '(A (B 2) (1 C 4) (D 1 (6 F)) ((G 4) 6) F) ) )
+( print (mapcan 'f '(A (B 2) (1 C 4) (D 1 (6 F)) ((G 4) 6) F) ) )

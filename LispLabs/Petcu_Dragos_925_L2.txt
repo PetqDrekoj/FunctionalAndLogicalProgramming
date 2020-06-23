@@ -1,0 +1,19 @@
+; 9. Convert a tree of type (1) to type (2).
+; (A 2 B 0 C 2 D 0 E 0) (1)
+; (A (B) (C (D) (E)))   (2)
+
+; transform(l1..ln) =
+;		(l1),  l2 == 0 and n == 2
+;               (l1) U (transform(l3..ln)), l2 == 0
+;		list(l1 U transform(l3..ln)), l2 != 0
+
+
+(defun transform ( l )
+    (cond
+        ( (AND(equal (car(cdr l)) 0) (null(cdr(cdr l)))) (cons (car l) nil))
+        ( (equal (car(cdr l)) 0) (cons(cons (car l) nil) (cons(transform (cdr (cdr l))) nil) ))
+        ( t (cons (car l) (transform (cdr (cdr l))))  )
+    )
+)
+
+(print (transform '(A 2 B 0 C 2 D 0 E 0)))

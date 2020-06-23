@@ -1,0 +1,29 @@
+;   invert ( l1.. ln) = { [], n = 0
+;                           invert(l2..ln) U l1, otherwise
+
+(defun invert ( l)
+    (cond 
+        ( (null l) nil )
+        (t (append (invert (cdr l)) (list(car l))))
+    )
+)
+
+
+;       mult(l1..ln, c ,r ) = { (r) , n = 0 and r != 0 
+;                               nil, n = 0
+;                               (l1*c+r)%10 U mult(l2..ln,c, (l1*c+r)/10), otherwise
+
+(defun mult( l c r) 
+    (cond 
+        ( (AND(null l)(> r 0)) (list r))
+        ( (null l) nil)
+        ( t (append (mult (cdr l) c (floor (+(* (car l) c)r) 10)) (list(MOD (+(* (car l) c) r) 10)))) 
+    )
+)
+
+; main( l1..ln c) = mult(invert(l1..ln),c,0)
+
+(defun main (l c) (mult (invert l) c 0))
+
+;(print (invert '(1 2 3 4 a)))
+(print (main '(9 9) 4))

@@ -1,0 +1,40 @@
+;9.Write a function that removes all occurrences of an atom from any level of a list.
+
+; removeNil (l1 l2) = {
+;               nil, l1 null and l2 null
+;               reduce(removeNil l2), l1 null and l2 list
+;               (l2), l1 null and l2 atom
+;               l1, l2 null
+;               (l1 l2), l1 atom and l2 atom
+;               (l1 reduce(removeNil l2)), l1 atom and l2 list
+;               (l1 l2), l1 list and l2 atom
+;               (l1 reduce(removeNil l2)), l1 list and l2 list 
+
+(defun removeNil (l1 l2)
+    (cond
+        ( (and(null l1) (null l2)) nil)
+        ( (and(null l1) (listp l2) ) (reduce #'removeNil l2) )
+        ( (and(null l1) (atom l2) ) (list l2) )
+        ( (null l2) l1 )
+        ( (and(atom l1) (atom l2) ) (list l1 l2) )
+        ( (and(atom l1) (listp l2) ) (list( l1 (reduce #'removeNil l2) ) ) )
+        ( (and(listp l1) (atom l2) ) (append l1 (list l2) ) )
+        ( (and(listp l1) (listp l2) ) (append l1 (list(reduce #'removeNil l2)))   )
+    )
+)
+
+
+;   removeOccMap(l,e)
+;           nil, l = e
+;           l, l!=e
+;           U (removeOccMap(l,e)), l list
+
+(defun removeOccMap (l e)
+    (cond
+        ((equal l e) nil)
+        ( (and(not(equal l e)) (atom l))  l)
+        ( t (mapcar (lambda (x) (removeOccMap x e )) l ))
+    )
+)
+
+(print  (reduce #'removeNil (removeOccMap '(1 2 3 4 5 (1 2 3 7 4) (1 2 3) (1 2) 1 7) 7)) )
